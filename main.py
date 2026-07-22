@@ -14,7 +14,14 @@ from AppKit import NSWorkspace
 output_dir = Path.home() / "Downloads"
 output_dir.mkdir(parents=True, exist_ok=True)
 
+class MathHelper():
+    def __init__(self):
+        pass
 
+    def union(self):
+        """
+        Calculates the union of two windows
+        """
 
 class WindowHelper():
     def __init__(self):
@@ -59,6 +66,26 @@ class WindowHelper():
 
         return(program_name, pid)
 
+    def get_layers(self):
+        for z_index, window in enumerate(self.windows):
+            bundle_id = window.get(Quartz.kCGWindowOwnerName)
+
+            if bundle_id not in ["Control Center"]:
+                print({
+                    "z_index": z_index,
+                    "program": bundle_id,
+                    "title": window.get(Quartz.kCGWindowName),
+                    "layer": window.get(Quartz.kCGWindowLayer),
+                    "pid": window.get(Quartz.kCGWindowOwnerPID)
+                })
+
+    def get_programs(self, xmin, xmax, ymin, ymax):
+        """
+        Determine which programs are included in the screenshot
+        xmin, xmax, ymin, ymax: locators for selected region in screenshot
+        """
+
+
 class SmartScreenshot():
     def __init__(self):
         self.hotkeys = keyboard.GlobalHotKeys({
@@ -92,3 +119,4 @@ class SmartScreenshot():
 wh = WindowHelper()
 print(wh.get_bounds())
 print(wh.get_top_level())
+wh.get_layers()
