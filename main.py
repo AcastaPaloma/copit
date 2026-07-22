@@ -1,12 +1,14 @@
-from AppKit import NSWorkspace
 
 from pathlib import Path
 from datetime import datetime
 import subprocess
 from pynput import keyboard
 
+from typing import List, Dict, Set
+
 ## Screen Read
 import Quartz
+from AppKit import NSWorkspace
 
 ### CONFIGS ###
 output_dir = Path.home() / "Downloads"
@@ -26,6 +28,36 @@ class WindowHelper():
             Quartz.kCGNullWindowID
         )
 
+        self.app = NSWorkspace.sharedWorkspace().frontmostApplication()
+
+    def get_bounds(self) -> Dict[str, List[tuple]]:
+        programs = dict()
+
+        for window in self.windows:
+            if window.get(Quartz.kCGWindowLayer, 1) != 0:
+                continue
+
+            if not window.get(Quartz.kCGWindowIsOnscreen, False):
+                continue
+
+            bounds = window[Quartz.kCGWindowBounds]
+            owner = window.get(Quartz.kCGWindowOwnerName)
+            title = window.get(Quartz.kCGWindowName)
+
+            x = bounds["X"]
+            y = bounds["Y"]
+            width = bounds["Width"]
+            height = bounds["Height"]
+
+            programs[owner] = [(x, y), (x + width, y + height)]
+
+        return programs
+
+    def get_top_level(self):
+        program_name = self.app.localizedName()
+        pid = self.app.processIdentifier()
+
+        return(program_name, pid)
 
 class SmartScreenshot():
     def __init__(self):
@@ -36,7 +68,7 @@ class SmartScreenshot():
         self.hotkeys.join()
 
     def find_app_name(self):
-
+        pass
 
     def take_screenshot(self):
         filename = datetime.now().strftime("Screenshot-%Y%m%d-%H%M%S.png")
@@ -54,4 +86,9 @@ class SmartScreenshot():
         self.process_screenshot()
 
     def process_screenshot(self):
+        pass
 
+
+wh = WindowHelper()
+print(wh.get_bounds())
+print(wh.get_top_level())
