@@ -1,5 +1,7 @@
+# Standard library
 from dataclasses import dataclass
 
+# macOS frameworks
 import Quartz
 
 

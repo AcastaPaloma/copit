@@ -1,3 +1,4 @@
+# Third-party packages
 import torch
 from transformers import AutoModelForImageTextToText, AutoProcessor
 from transformers.image_utils import load_image
@@ -64,11 +65,12 @@ class OCR:
             skip_special_tokens=True,
         )
 
-        words = generated_texts[0].split()[:8]
-        return " ".join(words).rstrip(" ,.;:-")
+        words = generated_texts[0].split()[:10]
+        res = ""
+        for word in words:
+            cleaned_word = "".join(char for char in word if char.isalpha())
+            res += cleaned_word
+            if word != words[-1]:
+                res += "_"
 
-
-if __name__ == "__main__":
-    image_path = "https://www.braveheartsalliance.org/pictures/home/2.jpg"
-    ocr = OCR(image_path=image_path)
-    print(ocr.generate())
+        return res

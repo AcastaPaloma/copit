@@ -10,6 +10,7 @@ from collections import defaultdict
 ## Utilities
 from mathhelper import MathHelper
 from screenshothelper import select_rectangle
+from ocr import OCR
 
 ## Native
 from PyObjCTools import AppHelper
@@ -35,6 +36,7 @@ class WindowHelper():
 
         self.app = NSWorkspace.sharedWorkspace().frontmostApplication()
         self.helper = MathHelper()
+        self.ocr = OCR()
 
     def get_bounds(self) -> Dict[str, List[tuple]]:
         programs = dict()
@@ -106,8 +108,8 @@ class SmartScreenshot():
         if rectangle is None:
             return
 
-        filename = datetime.now().strftime("Screenshot-%Y%m%d-%H%M%S.png")
-        output = output_dir / filename
+        self.filename = datetime.now().strftime("Screenshot-%Y%m%d-%H%M%S.png")
+        output = output_dir / self.filename
 
         subprocess.run([
             "/usr/sbin/screencapture",
@@ -121,7 +123,7 @@ class SmartScreenshot():
         self.process_screenshot()
 
     def process_screenshot(self):
-        pass
+        
 
 
 if __name__ == "__main__":

@@ -1,6 +1,10 @@
+# Future imports
 from __future__ import annotations
 
+# Third-party packages
 import objc
+
+# macOS frameworks
 from AppKit import (
     NSApplication,
     NSBackingStoreBuffered,
@@ -16,6 +20,7 @@ from AppKit import (
 )
 from Foundation import NSObject, NSThread
 
+# Local modules
 from mathhelper import Rect
 
 class SelectionView(NSView):
