@@ -1,15 +1,36 @@
+from dataclasses import dataclass
+
 import Quartz
 
-Rect = tuple[float, float, float, float]
 
-class MathHeler():
+@dataclass(frozen=True)
+class Rect:
+    """A rectangle represented by its top-left origin and dimensions."""
+
+    x: float
+    y: float
+    width: float
+    height: float
+
+    @property
+    def right(self) -> float:
+        return self.x + self.width
+
+    @property
+    def bottom(self) -> float:
+        return self.y + self.height
+
+class MathHelper():
+    def __init__(self):
+        pass
+
     @classmethod
     def _intersection(cls, a: Rect, b: Rect) -> Rect | None:
-        left = max(a[0], b[0])
-        top = max(a[1], b[1])
-        right = min(a[2], b[2])
-        bottom = min(a[3], b[3])
-        return (left, top, right, bottom) if left < right and top < bottom else None
+        left = max(a.x, b.x)
+        top = max(a.y, b.y)
+        right = min(a.right, b.right)
+        bottom = min(a.bottom, b.bottom)
+        return Rect(left, top, right - left, bottom - top) if left < right and top < bottom else None
 
     @classmethod
     def _subtract(cls, rect: Rect, blocker: Rect) -> list[Rect]:
@@ -18,23 +39,21 @@ class MathHeler():
         if overlap is None:
             return [rect]
 
-        left, top, right, bottom = rect
-        overlap_left, overlap_top, overlap_right, overlap_bottom = overlap
         pieces = []
 
-        if top < overlap_top:
-            pieces.append((left, top, right, overlap_top))
-        if overlap_bottom < bottom:
-            pieces.append((left, overlap_bottom, right, bottom))
-        if left < overlap_left:
-            pieces.append((left, overlap_top, overlap_left, overlap_bottom))
-        if overlap_right < right:
-            pieces.append((overlap_right, overlap_top, right, overlap_bottom))
+        if rect.y < overlap.y:
+            pieces.append(Rect(rect.x, rect.y, rect.width, overlap.y - rect.y))
+        if overlap.bottom < rect.bottom:
+            pieces.append(Rect(rect.x, overlap.bottom, rect.width, rect.bottom - overlap.bottom))
+        if rect.x < overlap.x:
+            pieces.append(Rect(rect.x, overlap.y, overlap.x - rect.x, overlap.height))
+        if overlap.right < rect.right:
+            pieces.append(Rect(overlap.right, overlap.y, rect.right - overlap.right, overlap.height))
 
         return pieces
 
     @classmethod
-    def _display_rectangles() -> list[Rect]:
+    def _display_rectangles(cls) -> list[Rect]:
         error, display_ids, _ = Quartz.CGGetActiveDisplayList(32, None, None)
         if error != Quartz.kCGErrorSuccess:
             raise RuntimeError(f"CGGetActiveDisplayList failed with error {error}")
@@ -42,18 +61,16 @@ class MathHeler():
         rectangles = []
         for display_id in display_ids:
             bounds = Quartz.CGDisplayBounds(display_id)
-            rectangles.append(
-                (
-                    float(bounds.origin.x),
-                    float(bounds.origin.y),
-                    float(bounds.origin.x + bounds.size.width),
-                    float(bounds.origin.y + bounds.size.height),
-                )
-            )
+            rectangles.append(Rect(
+                float(bounds.origin.x),
+                float(bounds.origin.y),
+                float(bounds.size.width),
+                float(bounds.size.height),
+            ))
         return rectangles
 
-
-    def get_visible_windows(self,
+    def get_visible_windows(
+        self,
         *,
         min_visible_fraction: float = 0.01,
         min_visible_edge: float = 8.0,
@@ -70,7 +87,7 @@ class MathHeler():
             | Quartz.kCGWindowListExcludeDesktopElements
         )
         windows = Quartz.CGWindowListCopyWindowInfo(options, Quartz.kCGNullWindowID)
-        displays = cls._display_rectangles()
+        displays = MathHelper._display_rectangles()
 
         result = []
         opaque_windows_in_front: list[Rect] = []
@@ -85,18 +102,18 @@ class MathHeler():
             if not bounds or bounds["Width"] <= 0 or bounds["Height"] <= 0:
                 continue
 
-            window_rect = (
+            window_rect = Rect(
                 float(bounds["X"]),
                 float(bounds["Y"]),
-                float(bounds["X"] + bounds["Width"]),
-                float(bounds["Y"] + bounds["Height"]),
+                float(bounds["Width"]),
+                float(bounds["Height"]),
             )
 
             # Clip the window to the union of all active displays.
             visible_parts = [
                 clipped
                 for display in displays
-                if (clipped := _intersection(window_rect, display)) is not None
+                if (clipped := MathHelper._intersection(window_rect, display)) is not None
             ]
 
             # Remove areas occupied by opaque normal windows in front.
@@ -104,7 +121,7 @@ class MathHeler():
                 visible_parts = [
                     piece
                     for part in visible_parts
-                    for piece in _subtract(part, blocker)
+                    for piece in MathHelper._subtract(part, blocker)
                 ]
                 if not visible_parts:
                     break
@@ -112,12 +129,12 @@ class MathHeler():
             meaningful_parts = [
                 part
                 for part in visible_parts
-                if part[2] - part[0] >= min_visible_edge
-                and part[3] - part[1] >= min_visible_edge
+                if part.width >= min_visible_edge
+                and part.height >= min_visible_edge
             ]
             visible_area = sum(
-                (right - left) * (bottom - top)
-                for left, top, right, bottom in meaningful_parts
+                part.width * part.height
+                for part in meaningful_parts
             )
             window_area = float(bounds["Width"] * bounds["Height"])
 
@@ -140,7 +157,6 @@ class MathHeler():
                 opaque_windows_in_front.append(window_rect)
 
         return result
-
 
     if __name__ == "__main__":
         for visible_window in get_visible_windows():

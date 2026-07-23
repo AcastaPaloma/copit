@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime
 import subprocess
 from pynput import keyboard
+from PyObjCTools import AppHelper
 
 ## Helpers
 from typing import List, Dict, Set
@@ -9,6 +10,7 @@ from collections import defaultdict
 
 ## Utilities
 from mathhelper import MathHelper
+from screenshothelper import select_rectangle
 
 ## Screen Read
 import Quartz
@@ -31,7 +33,7 @@ class WindowHelper():
         )
 
         self.app = NSWorkspace.sharedWorkspace().frontmostApplication()
-        self.math = MathHelper()
+        self.helper = MathHelper()
 
     def get_bounds(self) -> Dict[str, List[tuple]]:
         programs = dict()
@@ -79,38 +81,37 @@ class WindowHelper():
 
         return res
 
-    def get_foreground_programs(self):
-        pass
-
-    def get_screenshotted_programs(self, xmin, xmax, ymin, ymax) -> List[str]:
+    def get_screenshotted_programs(self) -> List[str]:
         """
         Determines which programs are included in the screenshot
         xmin, xmax, ymin, ymax: locators for selected region in screenshot
         Returns list of program name strings.
         """
-        layers = self.get_layers()
-
-        return self.math.algo()
+        on_screen_programs = self.helper.get_visible_windows()
+        return on_screen_programs
 
 class SmartScreenshot():
     def __init__(self):
         self.hotkeys = keyboard.GlobalHotKeys({
-            "<caps_lock>+s": self.take_screenshot,
+            "<cmd>+5": self.request_screenshot,
         })
         self.hotkeys.start()
-        self.hotkeys.join()
 
-    def find_app_name(self):
-        pass
+    def request_screenshot(self):
+        AppHelper.callAfter(self.take_screenshot)
 
     def take_screenshot(self):
+        rectangle = select_rectangle()
+        if rectangle is None:
+            return
+
         filename = datetime.now().strftime("Screenshot-%Y%m%d-%H%M%S.png")
         output = output_dir / filename
 
-        res = subprocess.run([
+        subprocess.run([
             "/usr/sbin/screencapture",
-            "-i",  # click-and-drag selection
-            "-x",  # suppress sound
+            f"-R{rectangle.x},{rectangle.y},{rectangle.width},{rectangle.height}",
+            "-x",
             str(output),
         ], 
         check=True,
@@ -122,6 +123,7 @@ class SmartScreenshot():
         pass
 
 
-wh = WindowHelper()
-print(wh.get_bounds(), end="\n")
-print(dict(wh.get_layers()))
+if __name__ == "__main__":
+    wh = WindowHelper()
+    ss = SmartScreenshot()
+    AppHelper.runEventLoop()

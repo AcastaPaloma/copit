@@ -1,0 +1,3 @@
+# macOS framework bindings used by screenshothelper.py and mathhelper.py
+pyobjc-framework-Cocoa==12.2.1
+pyobjc-framework-Quartz==12.2.1
