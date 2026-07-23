@@ -20,8 +20,7 @@ PROMPT = "Describe this image in at most eight words. Output only the descriptio
 
 
 class OCR:
-    def __init__(self, image_path):
-        self.image = load_image(image_path)
+    def __init__(self):
         print(f"Loading SmolVLM on {DEVICE}...", flush=True)
         self.processor = AutoProcessor.from_pretrained(
             "HuggingFaceTB/SmolVLM-256M-Instruct",
@@ -35,7 +34,9 @@ class OCR:
         ).to(DEVICE)
         print("Model loaded.", flush=True)
 
-    def generate(self):
+    def generate(self, image_path):
+        self.image = load_image(str(image_path))
+
         messages = [
             {
                 "role": "user",

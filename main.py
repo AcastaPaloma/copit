@@ -36,7 +36,6 @@ class WindowHelper():
 
         self.app = NSWorkspace.sharedWorkspace().frontmostApplication()
         self.helper = MathHelper()
-        self.ocr = OCR()
 
     def get_bounds(self) -> Dict[str, List[tuple]]:
         programs = dict()
@@ -95,6 +94,7 @@ class WindowHelper():
 
 class SmartScreenshot():
     def __init__(self):
+        self.ocr = OCR()
         self.hotkeys = keyboard.GlobalHotKeys({
             "<cmd>+5": self.request_screenshot,
         })
@@ -108,22 +108,25 @@ class SmartScreenshot():
         if rectangle is None:
             return
 
-        self.filename = datetime.now().strftime("Screenshot-%Y%m%d-%H%M%S.png")
-        output = output_dir / self.filename
+        filename = datetime.now().strftime("Screenshot-%Y%m%d-%H%M%S.png")
+        screenshot_path = output_dir / filename
 
         subprocess.run([
             "/usr/sbin/screencapture",
             f"-R{rectangle.x},{rectangle.y},{rectangle.width},{rectangle.height}",
             "-x",
-            str(output),
+            str(screenshot_path),
         ], 
         check=True,
         timeout=5)
 
-        self.process_screenshot()
+        self.process_screenshot(screenshot_path)
 
-    def process_screenshot(self):
-        
+    def process_screenshot(self, screenshot_path: Path) -> str:
+        print(f"Processing screenshot: {screenshot_path}", flush=True)
+        description = self.ocr.generate(screenshot_path)
+        print(f"Description: {description}", flush=True)
+        return description
 
 
 if __name__ == "__main__":
