@@ -15,11 +15,7 @@ else:
     DTYPE = torch.float32
     ATTENTION_IMPLEMENTATION = "eager"
 
-PROMPT = """
-         Given the image, identify key elements.
-         Output a single string describing this image.
-         It will serve as file name.
-         """
+PROMPT = "Describe this image in at most eight words. Output only the description."
 
 
 class OCR:
@@ -55,16 +51,24 @@ class OCR:
 
         print("Generating description...", flush=True)
         with torch.inference_mode():
-            generated_ids = self.model.generate(**inputs, max_new_tokens=5)
+            generated_ids = self.model.generate(
+                **inputs,
+                max_new_tokens=32,
+                do_sample=False,
+            )
+
+        prompt_length = inputs["input_ids"].shape[1]
+        generated_ids = generated_ids[:, prompt_length:]
         generated_texts = self.processor.batch_decode(
             generated_ids,
             skip_special_tokens=True,
         )
 
-        return generated_texts[0]
+        words = generated_texts[0].split()[:8]
+        return " ".join(words).rstrip(" ,.;:-")
 
 
 if __name__ == "__main__":
-    image_path = "https://cdn.britannica.com/61/93061-050-99147DCE/Statue-of-Liberty-Island-New-York-Bay.jpg"
+    image_path = "https://www.braveheartsalliance.org/pictures/home/2.jpg"
     ocr = OCR(image_path=image_path)
     print(ocr.generate())
