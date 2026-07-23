@@ -2,7 +2,6 @@ from pathlib import Path
 from datetime import datetime
 import subprocess
 from pynput import keyboard
-from PyObjCTools import AppHelper
 
 ## Helpers
 from typing import List, Dict, Set
@@ -12,9 +11,11 @@ from collections import defaultdict
 from mathhelper import MathHelper
 from screenshothelper import select_rectangle
 
-## Screen Read
+## Native
+from PyObjCTools import AppHelper
 import Quartz
 from AppKit import NSWorkspace
+from Vision import VNRecognizeTextRequest
 
 ### CONFIGS ###
 output_dir = Path.home() / "Downloads"
