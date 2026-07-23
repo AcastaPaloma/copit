@@ -1,10 +1,14 @@
-
 from pathlib import Path
 from datetime import datetime
 import subprocess
 from pynput import keyboard
 
+## Helpers
 from typing import List, Dict, Set
+from collections import defaultdict
+
+## Utilities
+from mathhelper import MathHelper
 
 ## Screen Read
 import Quartz
@@ -13,16 +17,7 @@ from AppKit import NSWorkspace
 ### CONFIGS ###
 output_dir = Path.home() / "Downloads"
 output_dir.mkdir(parents=True, exist_ok=True)
-
-class MathHelper():
-    def __init__(self):
-        pass
-
-    def union(self):
-        """
-        Calculates the union of two windows
-        """
-
+        
 class WindowHelper():
     def __init__(self):
         self.options = (
@@ -36,6 +31,7 @@ class WindowHelper():
         )
 
         self.app = NSWorkspace.sharedWorkspace().frontmostApplication()
+        self.math = MathHelper()
 
     def get_bounds(self) -> Dict[str, List[tuple]]:
         programs = dict()
@@ -60,31 +56,41 @@ class WindowHelper():
 
         return programs
 
-    def get_top_level(self):
-        program_name = self.app.localizedName()
-        pid = self.app.processIdentifier()
-
-        return(program_name, pid)
-
-    def get_layers(self):
+    def get_layers(self) -> Dict[int, int]:
+        """
+        Returns the smallest (most top-level) layer of any given program.
+        Returns Dict[PID, min. LAYER]
+        """
+        res = defaultdict()
         for z_index, window in enumerate(self.windows):
             bundle_id = window.get(Quartz.kCGWindowOwnerName)
 
             if bundle_id not in ["Control Center"]:
-                print({
+                meta = {
                     "z_index": z_index,
                     "program": bundle_id,
                     "title": window.get(Quartz.kCGWindowName),
                     "layer": window.get(Quartz.kCGWindowLayer),
                     "pid": window.get(Quartz.kCGWindowOwnerPID)
-                })
+                }
+                print(meta)
+                curr = meta["pid"] if meta["pid"] else 1000
+                res[meta["pid"]] = min(meta["layer"], curr)
 
-    def get_programs(self, xmin, xmax, ymin, ymax):
+        return res
+
+    def get_foreground_programs(self):
+        pass
+
+    def get_screenshotted_programs(self, xmin, xmax, ymin, ymax) -> List[str]:
         """
-        Determine which programs are included in the screenshot
+        Determines which programs are included in the screenshot
         xmin, xmax, ymin, ymax: locators for selected region in screenshot
+        Returns list of program name strings.
         """
+        layers = self.get_layers()
 
+        return self.math.algo()
 
 class SmartScreenshot():
     def __init__(self):
@@ -117,6 +123,5 @@ class SmartScreenshot():
 
 
 wh = WindowHelper()
-print(wh.get_bounds())
-print(wh.get_top_level())
-wh.get_layers()
+print(wh.get_bounds(), end="\n")
+print(dict(wh.get_layers()))
