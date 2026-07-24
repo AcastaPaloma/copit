@@ -124,8 +124,18 @@ class SmartScreenshot():
 
     def process_screenshot(self, screenshot_path: Path) -> str:
         print(f"Processing screenshot: {screenshot_path}", flush=True)
-        description = self.ocr.generate(screenshot_path)
+        description = self.ocr.generate(screenshot_path) + ".png"
         print(f"Description: {description}", flush=True)
+
+        str_path = str(screenshot_path)
+        new_path = str(output_dir / description)
+
+        subprocess.run([
+            "mv",
+            f"{str_path}",
+            f"{new_path}"
+            ]
+        )
         return description
 
 
