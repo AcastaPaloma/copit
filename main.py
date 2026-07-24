@@ -99,6 +99,7 @@ class SmartScreenshot():
             "<cmd>+5": self.request_screenshot,
         })
         self.hotkeys.start()
+        self.helper = WindowHelper()
 
     def request_screenshot(self):
         AppHelper.callAfter(self.take_screenshot)
@@ -123,9 +124,8 @@ class SmartScreenshot():
         self.process_screenshot(screenshot_path)
 
     def process_screenshot(self, screenshot_path: Path) -> str:
-        print(f"Processing screenshot: {screenshot_path}", flush=True)
-        description = self.ocr.generate(screenshot_path) + ".png"
-        print(f"Description: {description}", flush=True)
+        programs = self.helper.get_screenshotted_programs()        
+        description = "_".join(programs) + "_" + self.ocr.generate(screenshot_path) + ".png"
 
         str_path = str(screenshot_path)
         new_path = str(output_dir / description)

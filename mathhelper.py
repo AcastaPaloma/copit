@@ -33,7 +33,6 @@ class MathHelper():
         right = min(a.right, b.right)
         bottom = min(a.bottom, b.bottom)
         return Rect(left, top, right - left, bottom - top) if left < right and top < bottom else None
-
     @classmethod
     def _subtract(cls, rect: Rect, blocker: Rect) -> list[Rect]:
         """Return the rectangular pieces of rect not covered by blocker."""
