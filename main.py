@@ -12,6 +12,10 @@ from pynput import keyboard
 
 # macOS frameworks
 import Quartz
+from ApplicationServices import (
+    AXIsProcessTrustedWithOptions,
+    kAXTrustedCheckOptionPrompt,
+)
 from AppKit import NSWorkspace
 from PyObjCTools import AppHelper
 
@@ -22,7 +26,7 @@ from screenshothelper import RectangleSelector
 ### CONFIGS ###
 output_dir = Path.home() / "Downloads"
 output_dir.mkdir(parents=True, exist_ok=True)
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 
 def _filename_part(value: str) -> str:
@@ -135,6 +139,13 @@ class SmartScreenshot:
 
     @staticmethod
     def _request_permissions():
+        if not AXIsProcessTrustedWithOptions({kAXTrustedCheckOptionPrompt: False}):
+            print(
+                "Copit needs Accessibility permission for its global hotkey.",
+                flush=True,
+            )
+            AXIsProcessTrustedWithOptions({kAXTrustedCheckOptionPrompt: True})
+
         if not Quartz.CGPreflightListenEventAccess():
             print(
                 "Copit needs Input Monitoring permission for its global hotkey.",

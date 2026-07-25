@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "copit"
-version = "0.1.1"
+version = "0.1.2"
 license = "MIT"
 license-files = ["LICENSE"]
 description = "Capture and automatically name macOS screenshots"

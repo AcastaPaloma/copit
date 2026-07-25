@@ -3,8 +3,8 @@ class Copit < Formula
 
   desc "Capture and automatically name macOS screenshots"
   homepage "https://github.com/AcastaPaloma/copit"
-  url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.1.tar.gz"
-  sha256 "ecc33ca370d0378cbfbe46cb7ab3f0b1e395d227393660969faa6824ecd8ceb2"
+  url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.2.tar.gz"
+  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   license "MIT"
   head "https://github.com/AcastaPaloma/copit.git", branch: "main"
 
@@ -214,8 +214,8 @@ class Copit < Formula
 
   def caveats
     <<~EOS
-      On first launch, grant Copit Input Monitoring and Screen Recording
-      permissions in System Settings > Privacy & Security.
+      On first launch, grant Copit Accessibility, Input Monitoring, and Screen
+      Recording permissions in System Settings > Privacy & Security.
 
       Copit downloads HuggingFaceTB/SmolVLM-256M-Instruct on first use.
 

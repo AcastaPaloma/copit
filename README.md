@@ -42,6 +42,7 @@ Service output is written to `$(brew --prefix)/var/log/copit.log` and errors to
 When running in a terminal, the terminal application needs these permissions.
 When running as a service, macOS may list the Homebrew Python process instead:
 
+- Accessibility permission for the global hotkey.
 - Input Monitoring permission for the global hotkey.
 - Screen Recording permission for screenshots.
 

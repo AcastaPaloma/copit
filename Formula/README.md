@@ -1,6 +1,6 @@
 # Homebrew release handoff
 
-The source package and formula are prepared for version `0.1.1`. The remaining
+The source package and formula are prepared for version `0.1.2`. The remaining
 steps require publishing external GitHub state and are intentionally left to the
 repository owner.
 
@@ -17,17 +17,17 @@ Add a `LICENSE` file, then add the matching SPDX identifier to both:
 git add .gitignore Formula LICENSE README.md main.py ocr.py pyproject.toml requirements.txt
 git commit -m "Package Copit for Homebrew"
 git push -u origin main
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.1.2
+git push origin v0.1.2
 ```
 
 ## 3. Replace the release checksum
 
 ```sh
 curl -L \
-  https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.1.tar.gz \
-  -o /tmp/copit-v0.1.1.tar.gz
-shasum -a 256 /tmp/copit-v0.1.1.tar.gz
+  https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.2.tar.gz \
+  -o /tmp/copit-v0.1.2.tar.gz
+shasum -a 256 /tmp/copit-v0.1.2.tar.gz
 ```
 
 Replace the all-zero `sha256` value in `Formula/copit.rb` with that output.
@@ -35,13 +35,13 @@ Then publish the finalized formula:
 
 ```sh
 git add Formula/copit.rb
-git commit -m "Set copit 0.1.1 release checksum"
+git commit -m "Set copit 0.1.2 release checksum"
 git push
 ```
 
 ## 4. Refresh Python resources when dependencies change
 
-The version `0.1.1` resource blocks are already generated and checksummed.
+The version `0.1.2` resource blocks are already generated and checksummed.
 For later dependency updates, refresh them with:
 
 ```sh
@@ -78,7 +78,7 @@ and renaming.
 ```sh
 cd "$(brew --repository AcastaPaloma/tap)"
 git add Formula/copit.rb
-git commit -m "Add copit 0.1.1"
+git commit -m "Add copit 0.1.2"
 gh repo create AcastaPaloma/homebrew-tap --public --source=. --remote=origin --push
 ```
 
