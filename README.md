@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://github.com/AcastaPaloma/copit/stargazers">
+    <img src="assets/star-history.svg" alt="Copit star history" width="760">
+  </a>
+</p>
+
 # Copit
 
 Copit is a macOS screenshot tool that lets you select a region, identifies the
