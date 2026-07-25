@@ -3,8 +3,8 @@ class Copit < Formula
 
   desc "Capture and automatically name macOS screenshots"
   homepage "https://github.com/AcastaPaloma/copit"
-  url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "b9fbc1744de4c2bceb71a2c16c43763c6ce313cf8d49bfe1e9eec925b4e02c08"
+  url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.1.tar.gz"
+  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   license "MIT"
   head "https://github.com/AcastaPaloma/copit.git", branch: "main"
 
@@ -214,11 +214,23 @@ class Copit < Formula
 
   def caveats
     <<~EOS
-      On first launch, grant the calling terminal Accessibility/Input Monitoring
-      and Screen Recording permissions in System Settings > Privacy & Security.
+      On first launch, grant Copit Input Monitoring and Screen Recording
+      permissions in System Settings > Privacy & Security.
 
       Copit downloads HuggingFaceTB/SmolVLM-256M-Instruct on first use.
+
+      To launch Copit now and automatically at login:
+        brew services start copit
     EOS
+  end
+
+  service do
+    run opt_bin/"copit"
+    keep_alive true
+    process_type :interactive
+    working_dir Dir.home
+    log_path var/"log/copit.log"
+    error_log_path var/"log/copit.error.log"
   end
 
   test do

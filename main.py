@@ -17,13 +17,12 @@ from PyObjCTools import AppHelper
 
 # Local modules
 from mathhelper import MathHelper, Rect
-from ocr import OCR
 from screenshothelper import RectangleSelector
 
 ### CONFIGS ###
 output_dir = Path.home() / "Downloads"
 output_dir.mkdir(parents=True, exist_ok=True)
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 
 def _filename_part(value: str) -> str:
@@ -120,17 +119,42 @@ class WindowHelper:
 
 class SmartScreenshot:
     def __init__(self):
+        self._request_permissions()
         self._state_lock = Lock()
         self._state = "idle"
         self._selector = None
         self._cancel_requested = False
-        self.ocr = OCR()
+        self.ocr = None
         self.helper = WindowHelper()
         self.hotkeys = keyboard.GlobalHotKeys({
             "<cmd>+`": self.request_screenshot,
             "<esc>": self.request_cancel,
         })
         self.hotkeys.start()
+        print("Copit is running. Press Command+` to take a screenshot.", flush=True)
+
+    @staticmethod
+    def _request_permissions():
+        if not Quartz.CGPreflightListenEventAccess():
+            print(
+                "Copit needs Input Monitoring permission for its global hotkey.",
+                flush=True,
+            )
+            Quartz.CGRequestListenEventAccess()
+
+        if not Quartz.CGPreflightScreenCaptureAccess():
+            print(
+                "Copit needs Screen Recording permission to capture screenshots.",
+                flush=True,
+            )
+            Quartz.CGRequestScreenCaptureAccess()
+
+    def _get_ocr(self):
+        if self.ocr is None:
+            from ocr import OCR
+
+            self.ocr = OCR()
+        return self.ocr
 
     def request_screenshot(self):
         with self._state_lock:
@@ -204,7 +228,7 @@ class SmartScreenshot:
 
     def process_screenshot(self, screenshot_path: Path, rect: Rect) -> str:
         programs = self.helper.get_screenshotted_programs(rect=rect)
-        generated_description = self.ocr.generate(screenshot_path)
+        generated_description = self._get_ocr().generate(screenshot_path)
         filename_parts = []
         for part in [*programs, generated_description]:
             if cleaned_part := _filename_part(part):

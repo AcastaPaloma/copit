@@ -16,13 +16,33 @@ Press <kbd>Command</kbd>+<kbd>`</kbd> to open the selector. Press
 <kbd>Escape</kbd> to cancel before or during a drag.
 
 The first run downloads `HuggingFaceTB/SmolVLM-256M-Instruct` into the standard
-Hugging Face cache. Keep the terminal open while Copit is running.
+Hugging Face cache. Keep the terminal open when running Copit this way.
+
+## Run automatically at login
+
+Homebrew can run Copit as a background user service:
+
+```sh
+brew services start copit
+```
+
+The service starts immediately, launches automatically when you log in, and
+remains active while the laptop sleeps and wakes. Manage it with:
+
+```sh
+brew services restart copit
+brew services stop copit
+```
+
+Service output is written to `$(brew --prefix)/var/log/copit.log` and errors to
+`$(brew --prefix)/var/log/copit.error.log`.
 
 ## macOS permissions
 
-The terminal application launching Copit needs:
+When running in a terminal, the terminal application needs these permissions.
+When running as a service, macOS may list the Homebrew Python process instead:
 
-- Accessibility or Input Monitoring permission for the global hotkey.
+- Input Monitoring permission for the global hotkey.
 - Screen Recording permission for screenshots.
 
 Configure these under **System Settings → Privacy & Security**.
