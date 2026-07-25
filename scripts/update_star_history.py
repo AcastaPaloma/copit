@@ -151,10 +151,11 @@ def svg_for(repository: str, created_at: datetime, stars: list[datetime]) -> str
 
     repository_label = html.escape(repository)
     star_label = f"{count:,} star" if count == 1 else f"{count:,} stars"
-    marker = ""
+    marker_line = ""
     if stars:
-        marker = (
-            f'<circle class="marker" cx="{PLOT_RIGHT}" cy="{y_for(count):.1f}" r="6" />'
+        marker_line = (
+            f'  <circle class="marker" cx="{PLOT_RIGHT}" '
+            f'cy="{y_for(count):.1f}" r="6" />\n'
         )
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{SVG_HEIGHT}" viewBox="0 0 {SVG_WIDTH} {SVG_HEIGHT}" role="img" aria-labelledby="title description">
@@ -191,8 +192,7 @@ def svg_for(repository: str, created_at: datetime, stars: list[datetime]) -> str
   {" ".join(y_labels)}
   {" ".join(x_labels)}
   <path class="history" filter="url(#rough)" d="{history_path}" />
-  {marker}
-</svg>
+{marker_line}</svg>
 """
 
 
