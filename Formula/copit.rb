@@ -5,8 +5,8 @@ class Copit < Formula
   homepage "https://github.com/AcastaPaloma/copit"
   url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "b9fbc1744de4c2bceb71a2c16c43763c6ce313cf8d49bfe1e9eec925b4e02c08"
-  head "https://github.com/AcastaPaloma/copit.git", branch: "main"
   license "MIT"
+  head "https://github.com/AcastaPaloma/copit.git", branch: "main"
 
   depends_on "rust" => :build
   depends_on "libyaml"
