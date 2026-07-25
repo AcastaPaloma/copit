@@ -4,7 +4,7 @@ class Copit < Formula
   desc "Capture and automatically name macOS screenshots"
   homepage "https://github.com/AcastaPaloma/copit"
   url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.1.tar.gz"
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  sha256 "ecc33ca370d0378cbfbe46cb7ab3f0b1e395d227393660969faa6824ecd8ceb2"
   license "MIT"
   head "https://github.com/AcastaPaloma/copit.git", branch: "main"
 
