@@ -66,12 +66,8 @@ class OCR:
             skip_special_tokens=True,
         )
 
-        words = generated_texts[0].split()[:8]
-        res = ""
-        for word in words:
-            cleaned_word = "".join(char for char in word if char.isalpha())
-            res += cleaned_word
-            if word != words[-1]:
-                res += "_"
-
-        return res
+        cleaned_words = [
+            "".join(char for char in word if char.isalpha())
+            for word in generated_texts[0].split()[:8]
+        ]
+        return "_".join(word for word in cleaned_words if word)

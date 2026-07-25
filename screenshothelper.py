@@ -7,9 +7,13 @@ import objc
 # macOS frameworks
 from AppKit import (
     NSApplication,
+    NSApplicationActivationPolicyAccessory,
+    NSApplicationActivationPolicyProhibited,
     NSBackingStoreBuffered,
     NSBezierPath,
     NSColor,
+    NSEvent,
+    NSEventMaskKeyDown,
     NSFloatingWindowLevel,
     NSMakeRect,
     NSRectFill,
@@ -22,6 +26,7 @@ from Foundation import NSObject, NSThread
 
 # Local modules
 from mathhelper import Rect
+
 
 class SelectionView(NSView):
     start_point = objc.ivar()
@@ -68,9 +73,15 @@ class SelectionView(NSView):
             self.selection_callback(None)
 
     def keyDown_(self, event):
-        # Escape key
-        if event.keyCode() == 53:
-            self.selection_callback(None)
+        if event.charactersIgnoringModifiers() == "\x1b" or event.keyCode() == 53:
+            self.cancelOperation_(self)
+            return
+
+        objc.super(SelectionView, self).keyDown_(event)
+
+    def cancelOperation_(self, sender):
+        """Handle AppKit's standard cancellation action, including Escape."""
+        self.selection_callback(None)
 
     def selection_rect(self):
         if self.start_point is None or self.current_point is None:
@@ -104,20 +115,37 @@ class SelectionView(NSView):
         path.setLineWidth_(2.0)
         path.stroke()
 
+
+class SelectionWindow(NSWindow):
+    def canBecomeKeyWindow(self):
+        """Allow this borderless window to receive keyboard events."""
+        return True
+
+
 class RectangleSelector(NSObject):
     window = objc.ivar()
     result = objc.ivar()
     app = objc.ivar()
+    event_monitor = objc.ivar()
+    finished = objc.ivar()
 
     def select(self) -> Rect | None:
         self.result = None
         self.app = NSApplication.sharedApplication()
+        self.event_monitor = None
+        self.finished = False
+
+        if self.app.activationPolicy() == NSApplicationActivationPolicyProhibited:
+            if not self.app.setActivationPolicy_(
+                NSApplicationActivationPolicyAccessory
+            ):
+                raise RuntimeError("Could not enable keyboard input for the selector")
 
         # Primary screen. See below for multi-monitor handling.
         screen = NSScreen.mainScreen()
         screen_frame = screen.frame()
 
-        self.window = NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(
+        self.window = SelectionWindow.alloc().initWithContentRect_styleMask_backing_defer_(
             screen_frame,
             NSWindowStyleMaskBorderless,
             NSBackingStoreBuffered,
@@ -149,16 +177,52 @@ class RectangleSelector(NSObject):
         )
 
         self.window.setContentView_(view)
-        self.window.makeKeyAndOrderFront_(None)
-        self.window.makeFirstResponder_(view)
-
         self.app.activateIgnoringOtherApps_(True)
-        self.app.runModalForWindow_(self.window)
+        self.window.makeKeyAndOrderFront_(None)
+        if not self.window.makeFirstResponder_(view):
+            self.window.orderOut_(None)
+            raise RuntimeError("Selection view could not become first responder")
+
+        self.event_monitor = NSEvent.addLocalMonitorForEventsMatchingMask_handler_(
+            NSEventMaskKeyDown,
+            self.handleKeyEvent_,
+        )
+
+        try:
+            self.app.runModalForWindow_(self.window)
+        finally:
+            if self.event_monitor is not None:
+                NSEvent.removeMonitor_(self.event_monitor)
+                self.event_monitor = None
+            self.window.orderOut_(None)
 
         return self.result
 
+    def handleKeyEvent_(self, event):
+        if event.charactersIgnoringModifiers() == "\x1b" or event.keyCode() == 53:
+            self.finish_selection(None)
+            return None
+
+        return event
+
+    def cancel(self):
+        """Cancel selection from outside the modal window's event callbacks."""
+        if self.finished:
+            return
+
+        self.finished = True
+        self.result = None
+        self.app.abortModal()
+
     def finish_selection(self, appkit_rect):
-        if appkit_rect is not None:
+        if self.finished:
+            return
+
+        self.finished = True
+
+        if appkit_rect is None:
+            self.result = None
+        else:
             screen = NSScreen.mainScreen()
             screen_frame = screen.frame()
 
@@ -179,7 +243,6 @@ class RectangleSelector(NSObject):
             )
 
         self.app.stopModal()
-        self.window.orderOut_(None)
 
 
 def select_rectangle() -> Rect | None:

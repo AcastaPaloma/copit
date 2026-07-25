@@ -22,9 +22,8 @@ class Rect:
     def bottom(self) -> float:
         return self.y + self.height
 
-class MathHelper():
-    def __init__(self):
-        pass
+
+class MathHelper:
 
     @classmethod
     def _intersection(cls, a: Rect, b: Rect) -> Rect | None:
@@ -33,6 +32,7 @@ class MathHelper():
         right = min(a.right, b.right)
         bottom = min(a.bottom, b.bottom)
         return Rect(left, top, right - left, bottom - top) if left < right and top < bottom else None
+
     @classmethod
     def _subtract(cls, rect: Rect, blocker: Rect) -> list[Rect]:
         """Return the rectangular pieces of rect not covered by blocker."""
@@ -159,10 +159,11 @@ class MathHelper():
 
         return result
 
-    if __name__ == "__main__":
-        for visible_window in get_visible_windows():
-            print(
-                visible_window["program"],
-                repr(visible_window["title"]),
-                f'{visible_window["visible_fraction"]:.1%} visible',
-            )
+
+if __name__ == "__main__":
+    for visible_window in MathHelper().get_visible_windows():
+        print(
+            visible_window["program"],
+            repr(visible_window["title"]),
+            f'{visible_window["visible_fraction"]:.1%} visible',
+        )
