@@ -6,6 +6,7 @@ class Copit < Formula
   url "https://github.com/AcastaPaloma/copit/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
   head "https://github.com/AcastaPaloma/copit.git", branch: "main"
+  license "MIT"
 
   depends_on "rust" => :build
   depends_on "libyaml"
