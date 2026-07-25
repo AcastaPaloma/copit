@@ -1,4 +1,5 @@
 # Standard library
+import argparse
 import subprocess
 from collections import defaultdict
 from datetime import datetime
@@ -22,6 +23,7 @@ from screenshothelper import RectangleSelector
 ### CONFIGS ###
 output_dir = Path.home() / "Downloads"
 output_dir.mkdir(parents=True, exist_ok=True)
+VERSION = "0.1.0"
 
 
 def _filename_part(value: str) -> str:
@@ -221,18 +223,21 @@ class SmartScreenshot:
         return destination.name
 
 
-if __name__ == "__main__":
-    action = 1
-    if action == 1:
-        ss = SmartScreenshot()
-        AppHelper.runEventLoop()
+def run() -> None:
+    parser = argparse.ArgumentParser(
+        prog="copit",
+        description="Capture and automatically name macOS screenshots.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {VERSION}",
+    )
+    parser.parse_args()
 
-    elif action == 2:
-        rectam = Rect(
-            x=200,
-            y=300,
-            width=1000,
-            height=400
-        )
-        wh = WindowHelper()
-        print(wh.get_screenshotted_programs(rectam))
+    SmartScreenshot()
+    AppHelper.runEventLoop()
+
+
+if __name__ == "__main__":
+    run()

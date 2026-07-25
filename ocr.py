@@ -24,11 +24,9 @@ class OCR:
         print(f"Loading SmolVLM on {DEVICE}...", flush=True)
         self.processor = AutoProcessor.from_pretrained(
             "HuggingFaceTB/SmolVLM-256M-Instruct",
-            local_files_only=True,
         )
         self.model = AutoModelForImageTextToText.from_pretrained(
             "HuggingFaceTB/SmolVLM-256M-Instruct",
-            local_files_only=True,
             dtype=DTYPE,
             _attn_implementation=ATTENTION_IMPLEMENTATION,
         ).to(DEVICE)

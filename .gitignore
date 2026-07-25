@@ -1,1 +1,14 @@
 SHORTCUT="command + "
+
+# Python environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Package build output
+build/
+dist/
+
+# macOS metadata
+.DS_Store
