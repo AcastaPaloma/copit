@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500" role="img" aria-labelledby="title description">
   <title id="title">AcastaPaloma/copit star history</title>
-  <desc id="description">A hand-drawn chart showing 0 stars on GitHub.</desc>
+  <desc id="description">A hand-drawn chart showing 1 star on GitHub.</desc>
   <style>
     .background { fill: #fffdf7; stroke: #292524; stroke-width: 2; }
     .grid { fill: none; stroke: #d6d3d1; stroke-dasharray: 5 8; stroke-width: 1; }
@@ -26,10 +26,11 @@
   </defs>
   <rect class="background" x="5" y="5" width="890" height="490" rx="22" />
   <text class="title" x="44" y="50">Star History</text>
-  <text class="subtitle" x="44" y="78">AcastaPaloma/copit · 0 stars</text>
+  <text class="subtitle" x="44" y="78">AcastaPaloma/copit · 1 star</text>
   <path class="grid" d="M 82 410.0 H 850" /> <path class="grid" d="M 82 349.0 H 850" /> <path class="grid" d="M 82 288.0 H 850" /> <path class="grid" d="M 82 227.0 H 850" /> <path class="grid" d="M 82 166.0 H 850" /> <path class="grid" d="M 82 105.0 H 850" />
   <path class="axis" filter="url(#rough)" d="M 82 105 V 410 H 850" />
   <text class="axis-label" x="66" y="415.0" text-anchor="end">0</text> <text class="axis-label" x="66" y="354.0" text-anchor="end">1</text> <text class="axis-label" x="66" y="293.0" text-anchor="end">2</text> <text class="axis-label" x="66" y="232.0" text-anchor="end">3</text> <text class="axis-label" x="66" y="171.0" text-anchor="end">4</text> <text class="axis-label" x="66" y="110.0" text-anchor="end">5</text>
   <text class="axis-label" x="82.0" y="444" text-anchor="middle">Launch</text> <text class="axis-label" x="850.0" y="444" text-anchor="middle">Latest</text>
-  <path class="history" filter="url(#rough)" d="M 82 410.0 L 850 410.0" />
+  <path class="history" filter="url(#rough)" d="M 82 410.0 L 410.7 410.0 L 410.7 349.0 L 850 349.0" />
+  <circle class="marker" cx="850" cy="349.0" r="6" />
 </svg>
